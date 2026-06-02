@@ -1,0 +1,25 @@
+<div class="row mt-5 mb-5">
+    <div class="col">
+        <form class="form-inline" action="">
+            <div class="form-group mx-sm-3">
+                <label class="sr-only" for="inlineFormInputGroup">{{#str}}hub:overview:search:keyword, eportfolioplugins_hub{{/str}}</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text"><i class="fa fa-search"></i></div>
+                    </div>
+                    <input type="text" name="search" class="form-control" id="inlineFormInputGroup"
+                           placeholder="{{placeholder}}" {{#keyword}}value="{{keyword}}"{{/keyword}}>
+                    {{#tsort}}
+                        <input type="hidden" name="tsort" class="form-control" id="inlineFormInputGroup" value="{{tsort}}">
+                    {{/tsort}}
+                </div>
+            </div>
+        </form>
+        {{#reseturl}}
+            <div class="ml-3 mt-3">
+                <a href="{{reseturl}}" class="btn btn-primary"><i class="fa fa-undo"></i> {{#str}}
+                    hub:overview:search:reset, eportfolioplugins_hub{{/str}}</a>
+            </div>
+        {{/reseturl}}
+    </div>
+</div>
