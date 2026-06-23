@@ -25,6 +25,20 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Check if user can perform simple approval process.
+ *
+ * @param int $userid
+ * @return bool
+ */
+function eportfolioplugins_hub_is_simple_approver($userid) {
+
+    // Get all courses for the user with the specified capability.
+    $courses = get_user_capability_course('eportfolioplugins/hub:approvesimple', $userid, false);
+
+    return !empty($courses);
+}
+
+/**
  * Get users who can perform advance approval process.
  *
  * @param int $step
@@ -74,6 +88,7 @@ function eportfolioplugins_hub_is_advanced_approver($step) {
  * @return array Associative array of potential approvers: [userid => fullname]
  */
 function eportfolioplugins_hub_get_approvers_by_enrolment(int $userid): array {
+    global $DB;
     $config = get_config('eportfolioplugins_hub');
 
     if (empty($config->simpleapprovalrole)) {
@@ -97,22 +112,35 @@ function eportfolioplugins_hub_get_approvers_by_enrolment(int $userid): array {
     $approvers = [];
 
     foreach ($enrolledcourses as $course) {
+
         $coursecontext = context_course::instance($course->id);
 
-        foreach ($roleids as $roleid) {
-            // Fetch only the fields needed for fullname() to avoid loading unnecessary data.
-            $roleusers = get_role_users(
-                    $roleid,
-                    $coursecontext,
-                    false,
-                    'u.id, u.firstname, u.lastname, u.firstnamephonetic, u.lastnamephonetic, u.middlename, u.alternatename'
-            );
+        // First check, if "intvalue" -> "is ePortfolio course" is set to 1.
+        // Get the field id to identify the custm field data.
+        $customfield = $DB->get_record('customfield_field', ['shortname' => 'eportfolio_course']);
 
-            foreach ($roleusers as $user) {
-                // Use userid as key so duplicates across courses are merged automatically.
-                if (has_capability('eportfolioplugins/hub:approvesimple', $coursecontext, $user->id)) {
-                    if (!isset($approvers[$user->id])) {
-                        $approvers[$user->id] = fullname($user);
+        if (!empty($customfield)) {
+
+            // Get the value for custom field id.
+            $customfielddata = $DB->get_record('customfield_data', ['fieldid' => $customfield->id, 'instanceid' => $course->id]);
+
+            if ($customfielddata->intvalue) {
+                foreach ($roleids as $roleid) {
+                    // Fetch only the fields needed for fullname() to avoid loading unnecessary data.
+                    $roleusers = get_role_users(
+                            $roleid,
+                            $coursecontext,
+                            false,
+                            'u.id, u.firstname, u.lastname, u.firstnamephonetic, u.lastnamephonetic, u.middlename, u.alternatename'
+                    );
+
+                    foreach ($roleusers as $user) {
+                        // Use userid as key so duplicates across courses are merged automatically.
+                        if (has_capability('eportfolioplugins/hub:approvesimple', $coursecontext, $user->id)) {
+                            if (!isset($approvers[$user->id])) {
+                                $approvers[$user->id] = fullname($user);
+                            }
+                        }
                     }
                 }
             }
@@ -185,14 +213,6 @@ function eportfolioplugins_hub_get_published_eportfolios($canseeall, $tsort = nu
 
     if (!empty($sortorder)) {
         $sql .= $sortorder;
-    }
-
-    // If page and perpage are set.
-    if (!empty($page)) {
-        $limitfrom = $page * $perpage;
-        $limitnum = $perpage;
-
-        $sql .= " LIMIT " . $limitfrom . ', ' . $limitnum;
     }
 
     return $DB->get_records_sql($sql, $params);
@@ -336,6 +356,20 @@ function eportfolioplugins_hub_action_button_delete($url, $title) {
     $data->deleteurl = $url->out(false);
     $data->title = $title;
     return $OUTPUT->render_from_template('eportfolioplugins_hub/button_delete', $data);
+
+}
+
+/**
+ * Generate delete button.
+ *
+ * @param string $url
+ * @return mixed
+ */
+function eportfolioplugins_hub_action_button_restore($url) {
+    global $OUTPUT;
+
+    $icon = $OUTPUT->pix_icon('e/redo', get_string('approval:overview:table:actions:restore', 'eportfolioplugins_hub'));
+    return \html_writer::link($url, $icon, ['class' => 'mr-2']);
 
 }
 

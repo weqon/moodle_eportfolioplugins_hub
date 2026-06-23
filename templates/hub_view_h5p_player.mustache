@@ -33,51 +33,46 @@
     }
 }}
 
-<div class="container-fluid">
-
-    <div class="row mt-5">
-        <div class="col">
-            {{#backurl}}
-                <a href="{{backurl}}" class="btn btn-primary" title="{{backurlstring}}">
-                    {{#pix}} t/left, core, {{backurlstring}}{{/pix}}
-                    {{backurlstring}}
-                </a>
-            {{/backurl}}
+<div class="row mb-5">
+    <div class="col-12 pt-1">
+        <div class="d-flex align-items-center">
+            <h1 class="mb-0">
+                {{title}}
+            </h1>
         </div>
     </div>
+</div>
 
-    <div class="divider"></div>
+<div class="row">
+    <div class="col">
+        {{#backurl}}
+            <a href="{{backurl}}" class="btn btn-primary" title="{{backurlstring}}">
+                {{#pix}} t/left, core, {{backurlstring}}{{/pix}}
+                {{backurlstring}}
+            </a>
+        {{/backurl}}
+    </div>
+</div>
 
-    <div class="row">
-        <div class="col-lg-8">
-            {{{h5pplayer}}}
-        </div>
-        <div class="col-lg-4 pt-3">
-            <p class="alert alert-secondary">
-                <b>{{#str}} approval:view:status, eportfolioplugins_hub {{/str}}: </b>{{{state}}}<br>
-                {{#approvedset}}
-                    <b>{{#str}} approval:view:approvedby, eportfolioplugins_hub {{/str}}: </b>{{approvedby}}<br>
-                    <b>{{#str}} approval:view:approveddate, eportfolioplugins_hub {{/str}}: </b>{{approveddate}}<br><br>
-                {{/approvedset}}
-                {{^approvedset}}
-                    <br>
-                {{/approvedset}}
-                <b>{{#str}} approval:view:accesstype, eportfolioplugins_hub {{/str}}: </b>{{accesstype}}<br><br>
-                <b>{{#str}} approval:view:access, eportfolioplugins_hub {{/str}}: </b>{{{access}}}<br>
-                <b>{{#str}} approval:view:deleted, eportfolioplugins_hub {{/str}}: </b>{{{deleted}}}<br><br>
-                <b>{{#str}} approval:view:title, eportfolioplugins_hub {{/str}}: </b>{{title}}<br>
-                <b>{{#str}} approval:view:publishedby, eportfolioplugins_hub {{/str}}: </b>{{publishedby}}<br>
-                <b>{{#str}} approval:view:timecreated, eportfolioplugins_hub {{/str}}: </b>{{timecreated}}<br>
-                <b>{{#str}} approval:view:timemodified, eportfolioplugins_hub {{/str}}: </b>{{timemodified}}<br><br>
-                <b>{{#str}} approval:view:description, eportfolioplugins_hub {{/str}}: </b><br>{{description}}
+<div class="divider"></div>
+
+<div class="row">
+    <div class="col-lg-8">
+        {{{h5pplayer}}}
+    </div>
+    <div class="col-lg-4 pt-3">
+        <div class="alert alert-secondary">
+            <p>
+                <b>{{#str}} hub:overview:description, eportfolioplugins_hub {{/str}}: </b><br>{{description}}
             </p>
-            <p class="alert alert-primary">
-                <b>{{#str}} approval:view:usernotes, eportfolioplugins_hub {{/str}}: </b><br>{{usernotes}}<br><br>
-                {{#notesset}}
-                    <b>{{#str}} approval:view:notes, eportfolioplugins_hub {{/str}}: </b><br>{{notes}}
-                {{/notesset}}
+            <hr class="divider mt-5">
+            <p>
+                <b>{{#str}} hub:overview:publishedby, eportfolioplugins_hub {{/str}}: </b>{{publishedby}}<br>
+                <b>{{#str}} hub:overview:timecreated, eportfolioplugins_hub {{/str}}: </b>{{timecreated}}<br>
+                <b>{{#str}} hub:overview:timemodified, eportfolioplugins_hub {{/str}}: </b>{{timemodified}}<br>
+                <b>{{#str}} hub:overview:access, eportfolioplugins_hub {{/str}}: </b>{{{access}}}<br>
             </p>
-
         </div>
+
     </div>
 </div>

@@ -1,14 +1,40 @@
-<div class="container-fluid">
-    <div class="row mb-5">
-        <div class="col-12 pt-1">
-            <div class="d-flex align-items-center">
-                <h1 class="mb-0">
-                    {{#str}} pluginname, eportfolioplugins_hub {{/str}}
-                </h1>
+<div class="row">
+    {{#eportentries}}
+        <div class="col-md-4 col-lg-2 mb-5">
+            <div class="card h-100">
+                {{#detailsurl}}
+                    <a href="{{detailsurl}}" class="stretched-link" title="{{title}}"></a>
+                {{/detailsurl}}
+                {{^detailsurl}}
+                    <a class="metadata-details stretched-link" data-id="{{id}}" href="#"></a>
+                {{/detailsurl}}
+
+                {{#imgurlset}}
+                    <img class="card-img-top" loading="lazy" src="{{imgurl}}" width="100%" height="auto" alt="{{title}}">
+                {{/imgurlset}}
+                {{^imgurlset}}
+                    <span class="card-img-top placeholder-image" role="img" aria-label="Platzhalter für {{title}}"></span>
+                {{/imgurlset}}
+                <div class="card-body">
+                    <h4 class="card-title mt-2">
+                        <a class="link-dark text-decoration-none" href="#!">
+                            {{title}}
+                        </a>
+                    </h4>
+                    <div class="divider"></div>
+                    <p>
+                        {{description}}
+                    </p>
+                    <div class="divider"></div>
+
+                    <div class="text-center mt-4">
+                        <span class="ms-2 fs-7">{{#pix}} i/scheduled, core {{/pix}} {{releasedate}}</span>
+                        <span class="ms-2 fs-7">{{#pix}} i/user, core {{/pix}} {{usershared}}</span>
+                        <span class="ms-2 fs-7">{{{availableicon}}}</span>
+                    </div>
+                </div>
+
             </div>
         </div>
-    </div>
-    <div class="row">
-        {{> eportfolioplugins_hub/hub_overview_card }}
-    </div>
+    {{/eportentries}}
 </div>

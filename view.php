@@ -23,8 +23,7 @@
  */
 
 require_once('../../../config.php');
-#require_once('locallib.php');
-#require_once(__DIR__ . '/../lib.php');
+require_once('locallib.php');
 
 $id = required_param('id', PARAM_INT);
 
@@ -44,14 +43,19 @@ if (!$config->enablehub) {
 $url = new moodle_url('/local/eportfolio/hub/view.php', ['id' => $id]);
 $context = context_system::instance();
 
+$eport = $DB->get_record('eportfolioplugins_hub', ['id' => $id]);
+
+if (empty($eport)) {
+    redirect(new moodle_url('/local/eportfolio/hub/index.php'),
+            get_string('hub:overview:filenotfound', 'eportfolioplugins_hub'),
+            null, \core\output\notification::NOTIFY_ERROR);
+}
+
 // Set page layout.
 $PAGE->set_url($url);
 $PAGE->set_context($context);
 $PAGE->set_title(get_string('hub:view:header', 'eportfolioplugins_hub'));
 $PAGE->set_pagelayout('base');
-
-// ToDo: Implement new DB query once Workflow is finalised.
-$eport = $DB->get_record('local_eportfolio', ['id' => $id], '*', MUST_EXIST);
 
 // Get the ePortfolio entry and file storage.
 $fs = get_file_storage();
@@ -76,30 +80,23 @@ $h5pfile = $DB->get_record('h5p', ['pathnamehash' => $pathnamehash]);
 $backurl = new moodle_url('/local/eportfolio/hub/index.php');
 $backurlstring = get_string('hub:view:button:backtohub', 'eportfolioplugins_hub');
 
-$user = $DB->get_record('user', ['id' => $eport->usermodified]);
+$user = $DB->get_record('user', ['id' => $eport->publishedby]);
 $userfullname = fullname($user);
 
 // Prepare data for template files.
 $eportfolio = new stdClass();
 
 $eportfolio->title = $eport->title;
-#$eportfolio->description = (!empty($eport->description)) ? $eport->description : '';
-
-$eportfolio->description =
-        'Jemand musste Josef K. verleumdet haben, denn ohne dass er etwas Böses getan hätte, wurde er eines Morgens verhaftet. »Wie ein Hund!« sagte er, es war, als sollte die Scham ihn überleben.';
+$eportfolio->description = (!empty($eport->description)) ? $eport->description : '';
 
 $eportfolio->backurl = $backurl;
 $eportfolio->backurlstring = $backurlstring;
-$eportfolio->userfullname = $userfullname;
+$eportfolio->publishedby = $userfullname;
 
-$userdatemodified = date('d.m.Y', $eport->timemodified);
-$date = new \DateTime($userdatemodified); // For today/now, don't pass an arg.
-$date->modify("-1 day");
-$eportfolio->timecreated = $date->format("d.m.Y");
-$eportfolio->timemodified = $date->format("d.m.Y");
+$eportfolio->access = get_string('approval:overview:table:label:access:' . $eport->accesstype, 'eportfolioplugins_hub');
 
-#$eportfolio->timecreated = date('d.m.Y', $eport->timecreated);
-#$eportfolio->timemodified = date('d.m.Y', $eport->timemodified);
+$eportfolio->timecreated = date('d.m.Y', $eport->timecreated);
+$eportfolio->timemodified = date('d.m.Y', $eport->timemodified);
 
 $eportfolio->h5pplayer = \core_h5p\player::display($fileurl, $config, false, 'local_eportfolio', false);;
 

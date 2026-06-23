@@ -225,17 +225,6 @@ if (empty($record)) {
             // Queue the task.
             \core\task\manager::queue_adhoc_task($taskuser);
 
-            /*
-            // Trigger event for sharing ePortfolio.
-            \local_eportfolio\event\eportfolio_shared::create([
-                    'objectid' => $eport->fileid,
-                    'other' => [
-                            'description' => get_string('event:eportfolio:shared:' . $data->shareoption, 'local_eportfolio',
-                                    ['userid' => $USER->id, 'filename' => $filename, 'fileid' => $eport->fileid]),
-                    ],
-            ])->trigger();
-            */
-
             $str = new stdClass();
             $str->title = $formdata->title;
 

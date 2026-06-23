@@ -110,6 +110,7 @@ class review_form extends \moodleform {
                 $selectdata['2'] = get_string('form:review:select:simple', 'eportfolioplugins_hub');
             }
         } else {
+            $selectdata['2'] = get_string('form:review:select:simple', 'eportfolioplugins_hub');
             $selectdata['4'] = get_string('form:review:select:revoke', 'eportfolioplugins_hub');
         }
             $mform->addElement('select', 'approvalselect', get_string('form:review:select:approve', 'eportfolioplugins_hub'),

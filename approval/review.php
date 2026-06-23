@@ -29,8 +29,8 @@ require_once('../classes/forms/review_form.php');
 // First check, if user is logged in before accessing this page.
 require_login();
 
-if (!has_capability('eportfolioplugins/hub:approveadvanced', context_system::instance()) ||
-        !has_capability('eportfolioplugins/hub:approveadvanced', context_system::instance())) {
+if (!has_capability('eportfolioplugins/hub:approveadvanced', context_system::instance()) &&
+        !eportfolioplugins_hub_is_simple_approver($USER->id)) {
     redirect(new moodle_url('/local/eportfolio/hub/approval/overview.php'),
             get_string('error:missingcapability', 'local_eportfolio'),
             null, \core\output\notification::NOTIFY_ERROR);
@@ -185,17 +185,6 @@ if ($formdata = $mform->is_cancelled()) {
                 }
             }
         }
-
-        /*
-        // Trigger event for sharing ePortfolio.
-        \local_eportfolio\event\eportfolio_shared::create([
-                'objectid' => $eport->fileid,
-                'other' => [
-                        'description' => get_string('event:eportfolio:shared:' . $data->shareoption, 'local_eportfolio',
-                                ['userid' => $USER->id, 'filename' => $filename, 'fileid' => $eport->fileid]),
-                ],
-        ])->trigger();
-        */
 
         $str = new stdClass();
         $str->title = $formdata->title;

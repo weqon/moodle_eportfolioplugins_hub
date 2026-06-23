@@ -78,7 +78,7 @@ class publish_form extends \moodleform {
         // Add selection for teacher who can perform approval process.
         $approvalusers = eportfolioplugins_hub_get_approvers_by_enrolment($userid);
 
-        if (!empty($approvalusers)) {
+        if (empty($approvalusers)) {
 
             $options = [
                     'multiple' => false,
@@ -90,6 +90,10 @@ class publish_form extends \moodleform {
             $mform->addHelpButton('approvaluser', 'form:publish:select:approvaluser', 'eportfolioplugins_hub');
             $mform->addRule('approvaluser', get_string('form:publish:select:approvaluser:hint', 'eportfolioplugins_hub'), 'required', null,
                     'client');
+        } else {
+            redirect(new moodle_url('/local/eportfolio/index.php'),
+                    get_string('form:publish:select:approvaluser:notfound', 'eportfolioplugins_hub'),
+                    null, \core\output\notification::NOTIFY_ERROR);
         }
 
         $mform->addElement('html', '<div class="divider my-5"></div>');

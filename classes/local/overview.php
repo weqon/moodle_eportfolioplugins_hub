@@ -41,11 +41,12 @@ class overview {
      * @param string $tsort
      * @param int $page
      */
-    public function __construct($url, $search, $tsort = null, $page = null) {
+    public function __construct($url, $search, $page, $tsort = null,) {
         $this->url = $url;
         $this->search = $search;
         $this->tsort = $tsort;
         $this->page = $page;
+        $this->perpage = 50; // Default 20. Move to settings.php in the future or add select box to toolbar.
 
         $this->config = get_config('eportfolioplugins_hub');
     }
@@ -58,13 +59,44 @@ class overview {
     public function display() {
         global $DB, $OUTPUT;
 
+        $headingdata = new \stdClass();
+        $headingdata->title = (!empty($this->config->navtitle)) ? $this->config->navtitle :
+                get_string('hub:overview:header', 'eportfolioplugins_hub');
+
+        echo $OUTPUT->render_from_template('eportfolioplugins_hub/hub_heading', $headingdata);
+
         $toolbar = new \stdClass();
 
-        $toolbar->placeholder = get_string('hub:overview:search:keyword', 'eportfolioplugins_hub');
+        $placeholder = get_string('hub:overview:search:keyword', 'eportfolioplugins_hub');
+        $toolbar->placeholder = $placeholder;
+
+        // Dirty, but worky.
+        $filteroptions[] = [
+                'value' => 1,
+                'selected' => ($this->tsort === 1) ? 'selected' : '',
+                'label' => get_string('hub:overview:filter:newest_desc', 'eportfolioplugins_hub'),
+        ];
+        $filteroptions[] = [
+                'value' => 2,
+                'selected' => ($this->tsort === 2) ? 'selected' : '',
+                'label' => get_string('hub:overview:filter:newest_asc', 'eportfolioplugins_hub'),
+        ];
+        $filteroptions[] = [
+                'value' => 3,
+                'selected' => ($this->tsort === 3) ? 'selected' : '',
+                'label' => get_string('hub:overview:filter:title_asc', 'eportfolioplugins_hub'),
+        ];
+        $filteroptions[] = [
+                'value' => 4,
+                'selected' => ($this->tsort === 4) ? 'selected' : '',
+                'label' => get_string('hub:overview:filter:title_desc', 'eportfolioplugins_hub'),
+        ];
+
+        $toolbar->filteroptions = $filteroptions;
 
         if (!empty($this->search) || !empty($this->tsort)) {
             $toolbar->reseturl = new \moodle_url('/local/eportfolio/hub/index.php', ['page' => $this->page]);
-            $toolbar->placeholder = s($this->search);
+            $toolbar->searchvalue = (!empty($this->search)) ? s($this->search) : '';
         }
 
         echo $OUTPUT->render_from_template('eportfolioplugins_hub/hub_toolbar', $toolbar);
@@ -84,16 +116,19 @@ class overview {
                 $entry->detailsurl = $detailurl->out(false);
                 $entry->imgurlset = '';
                 $entry->title = $ent->title;
-                #$entry->description = $ent->description;
-                $entry->description =
-                        'Jemand musste Josef K. verleumdet haben, denn ohne dass er etwas Böses getan hätte, wurde er eines Morgens verhaftet. »Wie ein Hund!« sagte er, es war, als sollte die Scham ihn überleben.';
-                $entry->contenttype = '';
 
-                // Temp!
-                $userdatemodified = date('d.m.Y', $ent->timemodified);
-                $date = new \DateTime($userdatemodified); // For today/now, don't pass an arg.
-                $date->modify("-1 day");
-                $entry->releasedate = $date->format("d.m.Y");
+                $availableicon = $OUTPUT->pix_icon('t/unlock',
+                        get_string('hub:overview:internal', 'eportfolioplugins_hub'));
+
+                if ($ent->accesstype == 2) {
+                    $availableicon = $OUTPUT->pix_icon('i/siteevent',
+                            get_string('hub:overview:external', 'eportfolioplugins_hub'));
+                }
+
+                $entry->availableicon = $availableicon;
+
+                $entry->description = $ent->description;
+                $entry->contenttype = '';
 
                 $entry->releasedate = date('d.m.Y', $ent->approveddate);
 
@@ -108,6 +143,11 @@ class overview {
             $data->eportentries = $eportentries;
 
             echo $OUTPUT->render_from_template('eportfolioplugins_hub/hub_overview', $data);
+
+            $entrycount = count($entries);
+
+            // Also output the paging bar .
+            echo $OUTPUT->paging_bar($entrycount, $this->page, $this->perpage, $this->url);
 
         } else {
             // No files found for selected section.
@@ -131,71 +171,47 @@ class overview {
      * @return mixed
      */
     public function get_eportfolios() {
-        global $DB, $USER;
-
-        $sql = "SELECT * FROM {local_eportfolio}";
-        $params = [];
-
-        /*
-         * "External" geteilt ist automatisch auch "intern" verfügbar (wenn angemeldet).
-         * Extern erreichbar = nur explizit für extern geteilte Inhalte
-         * Intern erreichbar = nur explizit für intern geteilte Inhalte
-         * Wenn Nutzer angemeldet und extern erreichbar = externe und interne Inhalte
-         * Wenn Nutzer angemeldet und intern erreichbar = nur interne Inhalte
-         * Wenn Nutzer nicht angemeldet und intern erreichbar = keine Inhalte
-         * Wenn Nutzer nicht angemeldet und extern erreichbar = nur externe Inhalte
-         *
-         * Use this once we have a workflow
-         *
-         */
+        global $DB;
 
         $sql = "SELECT * FROM {eportfolioplugins_hub} WHERE active = 1";
 
+        $params = [];
         $whereclauses = [];
 
         if ($this->config->access === 'internal') {
             $params['accesstype'] = 1;
             $whereclauses[] = 'accesstype = :accesstype';
-        } else if ($this->config->access === 'external') {
-            // If we are not in my ePortfolios section.
+        } else if ($this->config->access === 'external' && !isloggedin()) {
+            // In case, user is not logged in, only view external published ePortfolios.
             $params['accesstype'] = 2;
             $whereclauses[] = 'accesstype = :accesstype';
-        } else {
-            return false;
+        }
+
+        // In case someone is searching for somethig.
+        if (!empty($this->search)) {
+            $params['title'] = "%$this->search%";
+            $whereclauses[] = "title LIKE :title";
         }
 
         if (!empty($whereclauses)) {
             $sql .= " AND ";
             $sql .= "(" . implode(" AND ", $whereclauses) . ")";
-
         }
 
-        // If tsort and tdir is set.
-        $sortorder = '';
+        // Default approveddate ASC.
+        $sortorder = " ORDER BY approveddate DESC";
 
-        if ($this->tsort) {
-
-            $orderby = self::get_sort_order($this->tdir);
-
-            if ($this->tsort === 'filename') {
-                $orderbyfield = 'title';
-            } else if ($this->tsort === 'filetimecreated') {
-                $orderbyfield = 'timecreated';
-            } else if ($this->tsort === 'filetimemodified') {
-                $orderbyfield = 'timemodified';
-            } else if ($this->tsort === 'sharestart') {
-                $orderbyfield = 'timecreated';
-            } else if ($this->tsort === 'shareend') {
-                $orderbyfield = 'enddate';
-            }
-
-            $sortorder = " ORDER BY " . $orderbyfield . " " . $orderby;
-
+        if (!empty($this->tsort)) {
+            $orderby = self::get_sort_order($this->tsort);
+            $sortorder = " ORDER BY " . $orderby;
         }
 
-        if (!empty($sortorder)) {
-            $sql .= $sortorder;
-        }
+        $sql .= $sortorder;
+
+        $limitfrom = $this->page * $this->perpage;
+        $limitnum = $this->perpage;
+
+        $sql .= " LIMIT " . $limitfrom . ', ' . $limitnum;
 
         return $DB->get_records_sql($sql, $params);
     }
@@ -208,14 +224,18 @@ class overview {
      */
     private function get_sort_order($sortorder) {
         switch ($sortorder) {
+            case '1':
+                return 'approveddate DESC';
+                break;
+            case '2':
+                return 'approveddate ASC';
+                break;
             case '3':
-                return 'DESC';
+                return 'title ASC';
                 break;
             case '4':
-                return 'ASC';
+                return 'title DESC';
                 break;
-            default:
-                return 'ASC';
         }
     }
 

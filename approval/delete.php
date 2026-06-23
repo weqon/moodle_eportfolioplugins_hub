@@ -65,8 +65,7 @@ if ($action === 'delete') {
 
     if (!empty($eport)) {
         // If user has the right capability, we will delete the file directly.
-        if (has_capability('eportfolioplugins/hub:approveadvanced', context_system::instance(), $USER->id) ||
-                has_capability('eportfolioplugins/hub:approveadvanced', context_system::instance(), $USER->id)) {
+        if (has_capability('eportfolioplugins/hub:approveadvanced', context_system::instance(), $USER->id)) {
 
             // Now delete the main file.
             $fs = get_file_storage();
@@ -90,25 +89,6 @@ if ($action === 'delete') {
 
             if ($DB->delete_records('eportfolioplugins_hub', ['id' => $eport->id])) {
 
-                /*
-                // Trigger event.
-                $filename = '';
-                if (!empty($eport->title)) {
-                    $filename = $eport->title;
-                } else {
-                    $filename = $file->get_filename();
-                }
-
-                \local_eportfolio\event\eportfolio_deleted::create([
-                        'objectid' => $eport->fileid,
-                        'other' => [
-                                'description' => get_string('event:eportfolio:deleted', 'local_eportfolio',
-                                        ['userid' => $USER->id, 'filename' => $filename,
-                                                'itemid' => $file->get_id()]),
-                        ],
-                ])->trigger();
-                */
-
                 redirect($redirecturl, get_string('delete:success', 'eportfolioplugins_hub'),
                         null, \core\output\notification::NOTIFY_SUCCESS);
 
@@ -129,8 +109,30 @@ if ($action === 'delete') {
             } else {
                 redirect($redirecturl, get_string('delete:error', 'eportfolioplugins_hub'),
                         null, \core\output\notification::NOTIFY_ERROR);
-
             }
+        }
+    } else {
+        // No file found or user is not allowed to access the file.
+        redirect($redirecturl,
+                get_string('delete:filenotfound', 'eportfolioplugins_hub'), null, \core\output\notification::NOTIFY_ERROR);
+    }
+} else if ($action === 'restore') {
+
+    // Get record for provided ID from DB.
+    $eport = $DB->get_record('eportfolioplugins_hub', ['id' => $id]);
+
+    if (!empty($eport)) {
+        $eport->active = 1; // Enable access in hub.
+        $eport->deleted = 0; // Remove flag as soft deleted.
+        $eport->usermodified = $USER->id;
+        $eport->timemodified = time();
+
+        if ($DB->update_record('eportfolioplugins_hub', $eport)) {
+            redirect($redirecturl, get_string('delete:restore:success', 'eportfolioplugins_hub'),
+                    null, \core\output\notification::NOTIFY_SUCCESS);
+        } else {
+            redirect($redirecturl, get_string('delete:restore:error', 'eportfolioplugins_hub'),
+                    null, \core\output\notification::NOTIFY_ERROR);
         }
     } else {
         // No file found or user is not allowed to access the file.

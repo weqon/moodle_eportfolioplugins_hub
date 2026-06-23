@@ -1,25 +1,65 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public Licensebllsdsadfasfd
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_eportfolio/share
+
+    Template purpose and description.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * none
+
+    Example context (json):
+    {
+    }
+}}
+
 <div class="row mt-5 mb-5">
     <div class="col">
-        <form class="form-inline" action="">
-            <div class="form-group mx-sm-3">
-                <label class="sr-only" for="inlineFormInputGroup">{{#str}}hub:overview:search:keyword, eportfolioplugins_hub{{/str}}</label>
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <div class="input-group-text"><i class="fa fa-search"></i></div>
-                    </div>
-                    <input type="text" name="search" class="form-control" id="inlineFormInputGroup"
-                           placeholder="{{placeholder}}" {{#keyword}}value="{{keyword}}"{{/keyword}}>
-                    {{#tsort}}
-                        <input type="hidden" name="tsort" class="form-control" id="inlineFormInputGroup" value="{{tsort}}">
-                    {{/tsort}}
-                </div>
+        <form class="d-flex flex-wrap align-items-center gap-2" method="get" action="">
+            <div class="input-group me-3" style="width: auto; min-width: 220px; max-width: 340px; flex: 1;">
+                <input type="text"
+                       id="hub-search"
+                       name="search"
+                       class="form-control"
+                       placeholder="{{placeholder}}"
+                       {{#searchvalue}}value="{{searchvalue}}"{{/searchvalue}}>
             </div>
+
+            <select id="hub-filter" name="filter" class="custom-select me-3">
+                {{#filteroptions}}
+                    <option value="{{value}}"{{#selected}} selected{{/selected}}>{{label}}</option>
+                {{/filteroptions}}
+            </select>
+
+            <button type="submit" class="btn btn-primary">
+                {{#pix}} i/search, core {{/pix}} {{#str}}hub:overview:search:keyword, eportfolioplugins_hub{{/str}}
+            </button>
+
+            {{#reseturl}}
+                <a href="{{reseturl}}" class="ms-3 btn btn-link">
+                    {{#pix}} e/cancel, core {{/pix}}{{#str}}hub:overview:search:reset, eportfolioplugins_hub{{/str}}
+                </a>
+            {{/reseturl}}
         </form>
-        {{#reseturl}}
-            <div class="ml-3 mt-3">
-                <a href="{{reseturl}}" class="btn btn-primary"><i class="fa fa-undo"></i> {{#str}}
-                    hub:overview:search:reset, eportfolioplugins_hub{{/str}}</a>
-            </div>
-        {{/reseturl}}
     </div>
 </div>

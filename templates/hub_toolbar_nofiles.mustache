@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template hub/button_delete
+    @template local_eportfolio/share
 
     Template purpose and description.
 
@@ -33,8 +33,10 @@
     }
 }}
 
-<a href="{{deleteurl}}" class="" data-modal="confirmation" data-modal-title-str='["approval:delete:header", "eportfolioplugins_hub"]'
-   data-modal-content-str='["approval:delete:checkconfirm", "eportfolioplugins_hub", "{{title}}"]'
-   data-modal-yes-button-str='["approval:delete:confirm", "eportfolioplugins_hub"]'
-   data-modal-destination="{{deleteurl}}">
-    {{#pix}} t/delete, core, {{#str}} approval:overview:table:actions:delete, eportfolioplugins_hub {{/str}}{{/pix}}</a>
+<div class="row pt-3">
+    <div class="col">
+        <p class="alert alert-info">
+            {{#pix}} docs, core {{/pix}} {{nofilesfound}}
+        </p>
+    </div>
+</div>

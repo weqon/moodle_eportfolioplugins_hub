@@ -42,9 +42,9 @@ $context = context_system::instance();
 
 $superuser = false; // Used for e.g. internal notes.
 
-if (is_siteadmin() || has_capability('eportfolioplugins/hub:viewall', context_system::instance()) ||
+if (has_capability('eportfolioplugins/hub:viewall', context_system::instance()) ||
         has_capability('eportfolioplugins/hub:approveadvanced', context_system::instance()) ||
-        has_capability('eportfolioplugins/hub:approvesimple', context_system::instance())) {
+        eportfolioplugins_hub_is_simple_approver($USER->id)) {
     $record = $DB->get_record('eportfolioplugins_hub', ['id' => $id]);
     $superuser = true;
 } else {

@@ -36,10 +36,23 @@ $string['overview:table:actions:viewhub'] = 'View ePortfolio';
 // Overview.
 $string['hub:overview:header'] = 'ePortfolio Hub';
 $string['hub:overview:nofiles'] = 'No content has been published in the ePortfolio Hub yet.';
+$string['hub:overview:filenotfound'] = 'The file you are looking for could not be found!';
+$string['hub:overview:internal'] = 'Available internally';
+$string['hub:overview:external'] = 'Available externally';
 $string['hub:overview:footer:managecontent'] = 'Manage pusblished content';
 $string['hub:overview:footer:vieweport'] = 'My ePortfolios';
 $string['hub:overview:search:keyword'] = 'Search';
 $string['hub:overview:search:reset'] = 'Reset';
+$string['hub:overview:filter:newest_desc'] = 'Newest';
+$string['hub:overview:filter:newest_asc'] = 'Oldest';
+$string['hub:overview:filter:title_asc'] = 'Title A-Z';
+$string['hub:overview:filter:title_desc'] = 'Title Z-A';
+$string['hub:overview:title'] = 'Title';
+$string['hub:overview:publishedby'] = 'Published by';
+$string['hub:overview:timecreated'] = 'Published at';
+$string['hub:overview:timemodified'] = 'Updated at';
+$string['hub:overview:description'] = 'Description';
+$string['hub:overview:access'] = 'Zugriff';
 
 // Approval overview.
 $string['approval:overview:header'] = 'ePortfolios for approval';
@@ -66,6 +79,7 @@ $string['approval:overview:table:label:deleted:1'] = 'Deleted';
 $string['approval:overview:table:actions:view'] = 'View ePortfolio';
 $string['approval:overview:table:actions:review'] = 'Review published ePortfolio';
 $string['approval:overview:table:actions:delete'] = 'Delete ePortfolio';
+$string['approval:overview:table:actions:restore'] = 'Restore deleted file';
 $string['approval:delete:header'] = 'Delete published ePortfolio?';
 $string['approval:delete:checkconfirm'] = 'Are you sure you want to delete the selected ePortfolio?';
 $string['approval:delete:confirm'] = 'Delete';
@@ -95,6 +109,8 @@ $string['delete:filenotfound'] = 'The file you are looking for could not be foun
 $string['delete:success:user'] = 'The selected ePortfolio has been marked for deletion and deactivated in the Hub!';
 $string['delete:success'] = 'The selected ePortfolio has been permanently deleted!';
 $string['delete:error'] = 'There was an error while deleting the file! Please try again!';
+$string['delete:restore:success'] = 'The deleted file has been restored.';
+$string['delete:restore:error'] = 'An error has occurred whilst restoring the deleted file! Please try again!';
 
 // Publish page & form.
 $string['publish:header'] = 'Publish selected ePortfolio';
@@ -137,6 +153,8 @@ Please select who should review your submitted ePortfolio.<br><br>
 You can only select users who are enrolled in the same course as you.
 ';
 $string['form:publish:select:approvaluser:hint'] = 'Please select an approval user!';
+$string['form:publish:select:approvaluser:notfound'] = 'We were unable to find a user to review your submitted ePortfolio.<br>
+Please make sure you are enrolled in a course that has been enabled for ePortfolio sharing.';
 $string['form:publish:confirm'] = 'Please note';
 $string['form:publish:confirm:label'] = 'The current data protection regulations and terms of use for this platform apply.
 By publishing your ePortfolio, you agree that the content may be used, edited, and reused by other users.';

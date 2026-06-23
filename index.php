@@ -26,20 +26,19 @@ require_once('../../../config.php');
 require_once('classes/local/overview.php');
 
 $search = optional_param('search', '', PARAM_ALPHA);
-$tsort = optional_param('tsort', '', PARAM_ALPHA);
+$tsort = optional_param('filter', 0, PARAM_INT);
 $page = optional_param('page', 0, PARAM_INT);
 
 $urlparams = [];
+$urlparams['page'] = $page;
 
-if ($search) {
+if (!empty($search)) {
     $urlparams['search'] = $search;
 }
 if ($tsort) {
     $urlparams['tsort'] = $tsort;
 }
-if ($page) {
-    $urlparams['page'] = $page;
-}
+
 
 $url = new moodle_url('/local/eportfolio/hub/index.php', $urlparams);
 
@@ -58,11 +57,12 @@ if (!$config->enablehub) {
     require_login();
 }
 
+$strtitle = (!empty($config->navtitle)) ? $config->navtitle : get_string('hub:overview:header', 'eportfolioplugins_hub');
+
 // Set page layout.
 $PAGE->set_url($url);
 $PAGE->set_context($context);
-$PAGE->set_title(get_string('hub:overview:header', 'eportfolioplugins_hub'));
-$PAGE->set_heading(get_string('hub:overview:header', 'eportfolioplugins_hub'));
+$PAGE->set_title($strtitle);
 $PAGE->set_pagelayout('base');
 
 // Print the header.

@@ -62,18 +62,13 @@ if ($page) {
 $url = new moodle_url('/local/eportfolio/hub/approval/overview.php', $params);
 $context = context_system::instance();
 
-// Who can see what?
-// Admin & Manager = See all.
-// Per Role = When have approver capabilities.
-// User = Only own published ePortfolios.
-
 $canseeall = 'user'; // Default.
 
-if (is_siteadmin() || has_capability('eportfolioplugins/hub:viewall', context_system::instance())) {
+if (has_capability('eportfolioplugins/hub:viewall', context_system::instance())) {
     $canseeall = 'all';
 } else if (has_capability('eportfolioplugins/hub:approveadvanced', context_system::instance())) {
     $canseeall = 'approveadvanced';
-} else if (has_capability('eportfolioplugins/hub:approvesimple', context_system::instance())) {
+} else if (eportfolioplugins_hub_is_simple_approver($USER->id)) {
     $canseeall = 'approvesimple';
 }
 
@@ -143,9 +138,8 @@ if (empty($records)) {
         $viewurl = new \moodle_url('/local/eportfolio/hub/approval/view.php', ['id' => $rec->id]);
         $actions .= eportfolioplugins_hub_action_button_view($viewurl);
 
-        // User can't review and approve own ePortfolio.
-        if (has_capability('eportfolioplugins/hub:approveadvanced', context_system::instance()) ||
-                has_capability('eportfolioplugins/hub:approveadvanced', context_system::instance())) {
+        // User can't review ePortfolio.
+        if ($canseeall != 'user') {
             $reviewurl = new \moodle_url('/local/eportfolio/hub/approval/review.php', ['id' => $rec->id]);
             $actions .= eportfolioplugins_hub_action_button_review($reviewurl);
         }
@@ -155,14 +149,22 @@ if (empty($records)) {
                 new \moodle_url('/local/eportfolio/hub/approval/delete.php', ['id' => $rec->id, 'sesskey' => sesskey(),
                         'action' => 'delete']);
 
-        if (has_capability('eportfolioplugins/hub:approveadvanced', context_system::instance()) ||
-                has_capability('eportfolioplugins/hub:approveadvanced', context_system::instance())) {
+        if ($canseeall === 'all' || $canseeall === 'approveadvanced') {
             // Can delete any eportfolio.
             $actions .= eportfolioplugins_hub_action_button_delete($deleteurl, $rec->title);
         } else if ($rec->publishedby === $USER->id && !$rec->deleted) {
-            // User can only delete ePortfolios not already flagged as soft deleted.
+            // User can only delete own ePortfolios not already flagged as soft deleted.
             $actions .= eportfolioplugins_hub_action_button_delete($deleteurl, $rec->title);
         }
+
+        // Restore soft deleted file URL.
+        if ($rec->deleted && ($canseeall === 'all' || $canseeall === 'approveadvanced')) {
+            $restorefile =
+                    new \moodle_url('/local/eportfolio/hub/approval/delete.php', ['id' => $rec->id, 'sesskey' => sesskey(),
+                            'action' => 'restore']);
+            $actions .= eportfolioplugins_hub_action_button_restore($restorefile);
+        }
+
         $deletedlabel = eportfolioplugins_hub_get_deleted_label($rec->deleted);
 
         $currentstep = (int) $rec->step;
