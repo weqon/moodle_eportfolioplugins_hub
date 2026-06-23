@@ -24,70 +24,76 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
+if ($ADMIN->fulltree) {
+    // Das Subplugin erstellt eine eigene SEITE
+    $subpage = new admin_settingpage('eportfolioplugins_hub',
+            get_string('pluginname', 'eportfolioplugins_hub'));
 
-// Enable ePortfolio Hub.
-$settings->add(
-        new admin_setting_configcheckbox(
-                'eportfolioplugins_hub/enablehub',
-                get_string('settings:hub:enable', 'eportfolioplugins_hub'),
-                get_string('settings:hub:enable:desc', 'eportfolioplugins_hub'),
-                false
-        )
-);
+    // Enable ePortfolio Hub.
+    $subpage->add(
+            new admin_setting_configcheckbox(
+                    'eportfolioplugins_hub/enablehub',
+                    get_string('settings:hub:enable', 'eportfolioplugins_hub'),
+                    get_string('settings:hub:enable:desc', 'eportfolioplugins_hub'),
+                    false
+            )
+    );
 
-// Default title for ePortfolio navbar entry.
-$settings->add(new admin_setting_configtext(
-        'eportfolioplugins_hub/navtitle',
-        get_string('settings:hub:navbartitle', 'eportfolioplugins_hub'),
-        get_string('settings:hub:navbartitle:desc', 'eportfolioplugins_hub'),
-        get_string('hub:navbar', 'eportfolioplugins_hub'),
-));
+    // Default title for ePortfolio navbar entry.
+    $subpage->add(new admin_setting_configtext(
+            'eportfolioplugins_hub/navtitle',
+            get_string('settings:hub:navbartitle', 'eportfolioplugins_hub'),
+            get_string('settings:hub:navbartitle:desc', 'eportfolioplugins_hub'),
+            get_string('hub:navbar', 'eportfolioplugins_hub'),
+    ));
 
-// Enable eportfolio Hub for internal access or external access.
-$choices = [
-        'internal' => get_string('settings:hub:access:internal', 'eportfolioplugins_hub'),
-        'external' => get_string('settings:hub:access:external', 'eportfolioplugins_hub')
-];
+    // Enable eportfolio Hub for internal access or external access.
+    $choices = [
+            'internal' => get_string('settings:hub:access:internal', 'eportfolioplugins_hub'),
+            'external' => get_string('settings:hub:access:external', 'eportfolioplugins_hub')
+    ];
 
-$settings->add(
-        new admin_setting_configselect(
-                'eportfolioplugins_hub/access',
-                get_string('settings:hub:access', 'eportfolioplugins_hub'),
-                get_string('settings:hub:access:desc', 'eportfolioplugins_hub'),
-                0,
-                $choices
-        )
-);
+    $subpage->add(
+            new admin_setting_configselect(
+                    'eportfolioplugins_hub/access',
+                    get_string('settings:hub:access', 'eportfolioplugins_hub'),
+                    get_string('settings:hub:access:desc', 'eportfolioplugins_hub'),
+                    0,
+                    $choices
+            )
+    );
 
-// Two-step approval process. Who is allowed to approve pubilshing of an eportfolio?
-$choicesapproval = [
-        'simple' => get_string('settings:hub:approval:simple', 'eportfolioplugins_hub'),
-        'advanced' => get_string('settings:hub:approval:advanced', 'eportfolioplugins_hub')
-];
+    // Two-step approval process. Who is allowed to approve pubilshing of an eportfolio?
+    $choicesapproval = [
+            'simple' => get_string('settings:hub:approval:simple', 'eportfolioplugins_hub'),
+            'advanced' => get_string('settings:hub:approval:advanced', 'eportfolioplugins_hub')
+    ];
 
-$settings->add(
-        new admin_setting_configselect(
-                'eportfolioplugins_hub/approve',
-                get_string('settings:hub:approval', 'eportfolioplugins_hub'),
-                get_string('settings:hub:approval:desc', 'eportfolioplugins_hub'),
-                0,
-                $choicesapproval
-        )
-);
+    $subpage->add(
+            new admin_setting_configselect(
+                    'eportfolioplugins_hub/approve',
+                    get_string('settings:hub:approval', 'eportfolioplugins_hub'),
+                    get_string('settings:hub:approval:desc', 'eportfolioplugins_hub'),
+                    0,
+                    $choicesapproval
+            )
+    );
 
-// Default role for simple approval.
-$settings->add(new admin_setting_pickroles(
-        'eportfolioplugins_hub/simpleapprovalrole',
-        get_string('settings:hub:approval:simple:role', 'eportfolioplugins_hub'),
-        get_string('settings:hub:approval:simple:role:desc', 'eportfolioplugins_hub'),
-        ['editingteacher'],
-));
+    // Default role for simple approval.
+    $subpage->add(new admin_setting_pickroles(
+            'eportfolioplugins_hub/simpleapprovalrole',
+            get_string('settings:hub:approval:simple:role', 'eportfolioplugins_hub'),
+            get_string('settings:hub:approval:simple:role:desc', 'eportfolioplugins_hub'),
+            ['editingteacher'],
+    ));
 
-// Default role for advanced approval.
-$settings->add(new admin_setting_pickroles(
-        'eportfolioplugins_hub/advancedapprovalrole',
-        get_string('settings:hub:approval:advanced:role', 'eportfolioplugins_hub'),
-        get_string('settings:hub:approval:advanced:role:desc', 'eportfolioplugins_hub'),
-        [],
-));
+    // Default role for advanced approval.
+    $subpage->add(new admin_setting_pickroles(
+            'eportfolioplugins_hub/advancedapprovalrole',
+            get_string('settings:hub:approval:advanced:role', 'eportfolioplugins_hub'),
+            get_string('settings:hub:approval:advanced:role:desc', 'eportfolioplugins_hub'),
+            [],
+    ));
+
+    $settings->add('local_eportfolio_settings', $subpage);
+}
