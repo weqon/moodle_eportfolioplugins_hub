@@ -5,7 +5,7 @@ within the Moodle instance for internal or external use.
 
 **Note: This plugin was published as MATURITY_BETA.
 If you encounter any issues using this plugin please report them to:
-<https://github.com/weqon/moodle_hub/issues>**
+<https://github.com/weqon/moodle_eportfolioplugins_hub/issues>**
 
 ## Installing via uploaded ZIP file ##
 
