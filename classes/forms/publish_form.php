@@ -78,7 +78,7 @@ class publish_form extends \moodleform {
         // Add selection for teacher who can perform approval process.
         $approvalusers = eportfolioplugins_hub_get_approvers_by_enrolment($userid);
 
-        if (empty($approvalusers)) {
+        if (!empty($approvalusers)) {
 
             $options = [
                     'multiple' => false,
